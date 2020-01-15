@@ -11,7 +11,7 @@ using namespace std;
 const int num_elem = 1e6;
 const int size_elem = 9 * 9;
 
-inline void comp(int8_t *v, int a, int b)
+inline void comp(uint8_t *v, int a, int b)
 {
     int8_t va = v[a];
     int8_t vb = v[b];
@@ -19,7 +19,7 @@ inline void comp(int8_t *v, int a, int b)
     v[b] = va < vb ? vb : va;
 }
 
-inline void sorter(int8_t *vec)
+inline void sorter(uint8_t *vec)
 {
     comp(vec, 0, 64);
     comp(vec, 1, 65);
@@ -687,7 +687,7 @@ inline void sorter(int8_t *vec)
 void sorting_network_bench(void)
 {
 
-    int8_t *data = static_cast<int8_t *>(calloc(sizeof(int8_t), num_elem * size_elem));
+    uint8_t *data = static_cast<uint8_t *>(calloc(sizeof(int8_t), num_elem * size_elem));
 
     std::random_device seed_gen;
     std::default_random_engine engine(seed_gen());
@@ -708,7 +708,7 @@ void sorting_network_bench(void)
 #endif
     for (int i = 0; i < num_elem; i++)
     {
-        sorter(data + i);
+        sorter(data + i * sizeof(uint8_t));
     }
     end = std::chrono::system_clock::now(); // 計測開始時間
 
@@ -741,7 +741,7 @@ void std_sort_bench(void)
 #endif
     for (int i = 0; i < num_elem; i++)
     {
-        std::sort(data + i, data + i + size_elem);
+        std::sort(data + i * sizeof(uint8_t), data + i * sizeof(uint8_t) + size_elem);
     }
     end = std::chrono::system_clock::now(); // 計測開始時間
 
@@ -752,7 +752,7 @@ void std_sort_bench(void)
 
 int compare_int(const void *a, const void *b)
 {
-    return *(int*)a - *(int*)b;
+    return *(int *)a - *(int *)b;
 }
 
 void qsort_bench(void)
@@ -779,7 +779,7 @@ void qsort_bench(void)
 #endif
     for (int i = 0; i < num_elem; i++)
     {
-        qsort(data, 10, sizeof(int8_t), compare_int);
+        qsort(data + i * sizeof(uint8_t), size_elem, sizeof(uint8_t), compare_int);
     }
     end = std::chrono::system_clock::now(); // 計測開始時間
 
